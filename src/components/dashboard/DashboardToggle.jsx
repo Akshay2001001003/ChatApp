@@ -1,11 +1,12 @@
 import React from 'react'
 import { Button, Drawer, Icon } from 'rsuite'
 import Dashboard from '.'
-import { useModelState } from '../../misc/custom-hooks'
+import { useMediaQuery, useModelState } from '../../misc/custom-hooks'
 
 function DashboardToggle() {
 
     const {isOpen,close,open} = useModelState();
+   const isMobile = useMediaQuery('(max-width:992px)')
 
   return (
     <>
