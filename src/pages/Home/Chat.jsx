@@ -23,10 +23,10 @@ if(!currentRoom){
   return <h6 className='text-center mt-page'>Chat {chatId} not found </h6>
 }
 
-const {name,descriprtion} = currentRoom;
+const {name,description} = currentRoom;
 
 const currentRoomData = {
-   name,descriprtion
+   name,description
 }
 
   return (
