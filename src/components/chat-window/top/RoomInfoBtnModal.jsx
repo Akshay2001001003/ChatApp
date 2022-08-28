@@ -7,7 +7,6 @@ function RoomInfoBtnModal() {
 const {isOpen,close,open} = useModelState();
 const description = useCurrentRoom(v => v.description);
 const name = useCurrentRoom(v=> v.name);
-console.log(description)
 
   return (
     <>
