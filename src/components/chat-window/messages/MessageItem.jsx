@@ -9,11 +9,11 @@ import ProfileAvatar from '../../ProfileAvatar';
 import IconBtnControl from './IconBtnControl';
 import ProfileInfoBtnModal from './ProfileInfoBtnModal';
 
-function MessageItem({ message,handleAdmin, handleLike }) {
+function MessageItem({ message, handleAdmin, handleLike, handleDelete }) {
   const { author, createdAt, text, likes, likeCount } = message;
 
   const [selfRef, isHovered] = useHover();
-  const isMobile = useMediaQuery(('(max-width:992px)'));
+  const isMobile = useMediaQuery('(max-width:992px)');
 
   const isAdmin = useCurrentRoom(v => v.isAdmin);
   const admins = useCurrentRoom(v => v.admins);
@@ -26,7 +26,10 @@ function MessageItem({ message,handleAdmin, handleLike }) {
   const isLiked = likes && Object.keys(likes).includes(auth.currentUser.uid);
 
   return (
-    <li className={`padded mb-1 cursor-pointer ${isHovered ? 'bg-black-02' : ''}`} ref={selfRef}>
+    <li
+      className={`padded mb-1 cursor-pointer ${isHovered ? 'bg-black-02' : ''}`}
+      ref={selfRef}
+    >
       <div className="d-flex align-items-center font-bolder mb-1">
         <PresenceDot uid={author.uid} />
 
@@ -56,14 +59,22 @@ function MessageItem({ message,handleAdmin, handleLike }) {
         />
 
         <IconBtnControl
-        {...(isLiked ? {color:'red'}:  {})}
+          {...(isLiked ? { color: 'red' } : {})}
           isVisible={canShowIcons}
-          iconName='heart'
+          iconName="heart"
           tooltip="Like this message"
-          onClick={()=> handleLike(message.id)}
+          onClick={() => handleLike(message.id)}
           badgeContent={likeCount}
         />
 
+        {isAuthor && (
+          <IconBtnControl
+            isVisible={canShowIcons}
+            iconName="close"
+            tooltip="Delete this message"
+            onClick={() => handleDelete(message.id)}
+          />
+        )}
       </div>
 
       <div>
