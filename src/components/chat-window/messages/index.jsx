@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 import { Alert } from 'rsuite';
 import { auth, database, storage } from '../../../misc/firebase';
-import { transformToArrWithId } from '../../../misc/helpers';
+import { groupBy, transformToArrWithId } from '../../../misc/helpers';
 import MessageItem from './MessageItem';
 
 function Messages() {
@@ -81,70 +81,80 @@ function Messages() {
     Alert.info(alertMsg, 4000);
   }, []);
 
-  const handleDelete = useCallback(async (msgId,file) => {
+  const handleDelete = useCallback(
+    async (msgId, file) => {
+      // eslint-disable-next-line no-alert
+      if (!window.confirm('Delete this message?')) {
+        return;
+      }
 
-  // eslint-disable-next-line no-alert
-   if(!window.confirm('Delete this message?') ) {
-    return;
-   }  
+      const isLast = messages[messages.length - 1].id === msgId;
 
-   const isLast = messages[messages.length - 1].id === msgId;
+      const updates = {};
 
-   const updates = {};
+      updates[`/messages/${msgId}`] = null;
 
-   updates[`/messages/${msgId}`] = null;
+      if (isLast && messages.length > 1) {
+        updates[`/rooms/${chatId}/lastMessage`] = {
+          ...messages[messages.length - 2],
+          msgId: messages[messages.length - 2].id,
+        };
+      }
 
-   if(isLast && messages.length > 1){
-    updates[`/rooms/${chatId}/lastMessage`] = {
-      ...messages[messages.length - 2],
-      msgId: messages[messages.length - 2].id
-    }
-   }
+      if (isLast && messages.length === 1) {
+        updates[`/rooms/${chatId}/lastMessage`] = null;
+      }
+      try {
+        await database.ref().update(updates);
+        Alert.info('Message has been deleted');
+      } catch (err) {
+        return Alert.error(err.message);
+      }
 
-   if(isLast && messages.length === 1){
-    updates[`/rooms/${chatId}/lastMessage`] = null;
-   }
-     try {
-      
-    await database.ref().update(updates);
-    Alert.info('Message has been deleted');
+      if (file) {
+        try {
+          const fileRef = storage.refFromURL(file.url);
 
-     } catch (err) {
-     return Alert.error(err.message);
-     }
+          await fileRef.delete();
+        } catch (err) {
+          Alert.error(err.message);
+        }
+      }
+    },
+    [chatId, messages]
+  );
 
-     if(file){
+  const renderMessages = () => {
+    const groups = groupBy(messages, item =>
+      new Date(item.createdAt).toDateString()
+    );
 
-       try {
-        
-        const fileRef = storage.refFromURL(file.url)
-  
-       await fileRef.delete()
+    const items = [];
 
-       } catch (err) {
-        Alert.error(err.message);
-       }
-
-     }
-
-
-  }, [chatId, messages]);
+    Object.keys(groups).forEach(date => {
+      items.push(
+        <li key={date} className="text-center mb-1 padding">
+          {date}
+        </li>
+      );
+      const msgs = groups[date].map(msg => (
+        <MessageItem
+          key={msg.id}
+          message={msg}
+          handleAdmin={handleAdmin}
+          handleLike={handleLike}
+          handleDelete={handleDelete}
+        />
+      ));
+      items.push(...msgs);
+    });
+    return items;
+  };
 
   return (
     <ul className="msg-list custom-scroll">
       {isChatEmpty && <li>No messages yet</li>}
-      {canShowMessages &&
-        messages.map(msg => {
-          return (
-            <MessageItem
-              key={msg.id}
-              message={msg}
-              handleAdmin={handleAdmin}
-              handleLike={handleLike}
-              handleDelete={handleDelete}
-            />
-          );
-        })}
+      {canShowMessages && renderMessages()}
     </ul>
   );
 }
