@@ -149,14 +149,17 @@ function Messages() {
 
       if (isLast && messages.length === 1) {
         updates[`/rooms/${chatId}/lastMessage`] = null;
+      
       }
       try {
         await database.ref().update(updates);
         Alert.info('Message has been deleted');
       } catch (err) {
+          // eslint-disable-next-line consistent-return
         return Alert.error(err.message);
       }
-
+  
+      
       if (file) {
         try {
           const fileRef = storage.refFromURL(file.url);
@@ -166,6 +169,7 @@ function Messages() {
           Alert.error(err.message);
         }
       }
+
     },
     [chatId, messages]
   );
@@ -198,7 +202,7 @@ function Messages() {
   };
 
   return (
-    <ul ref={selfRef} className="msg-list custom-scroll">
+    <ul ref={selfRef} className="msg-list custom-scroll" >
       {messages && messages.length >= PAGE_SIZE && <li className='text-center mt-2 mb-2'>
         <Button onClick={onLoadMore} color='green'>
           Load more

@@ -21,7 +21,7 @@ const renderFileMessage = file => {
 
   if (file.contentType.includes('audio')) {
     return (
-      <audio controls>
+      <audio controls><track kind="captions" />
         <source src={file.url} type="audio/mp3" />
         Your browser does not support the audio element
       </audio>

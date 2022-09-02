@@ -1,6 +1,6 @@
 import React, { memo } from 'react';
 import { Link } from 'react-router-dom';
-import { ButtonToolbar, Icon } from 'rsuite';
+import { ButtonToolbar, Icon, Tag } from 'rsuite';
 import { useCurrentRoom } from '../../../context/current-room.context';
 import { useMediaQuery } from '../../../misc/custom-hooks';
 import EditRoomBtnDrawer from './EditRoomBtnDrawer';
@@ -12,7 +12,7 @@ function Top() {
   const isMobile = useMediaQuery('(max-width:992px)');
 
   return (
-    <div>
+    <div className='shawdow'>
       <div className="d-flex justify-content-between align-items-center">
         <h4 className="text-disappear  d-flex align-items-center">
           <Icon
@@ -35,7 +35,7 @@ function Top() {
       </div>
 
       <div className="d-flex justify-content-between align-items-center">
-        <span>todo</span>
+        <Tag color='green'>Live  chat room</Tag>
         <RoomInfoBtnModal />
       </div>
     </div>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Badge, Icon, IconButton, Tooltip, Whisper } from 'rsuite';
 
-const ConditionalBadge = ({ condition, children }) => {
+function ConditionalBadge  ({ condition, children }) {
   return condition ? <Badge content={condition}>{children}</Badge> : children;
 };
 
